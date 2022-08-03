@@ -50,10 +50,10 @@ public class RobotContainer {
     var driveCommand = new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    -m_driverController.getRawAxis(1) * DriveConstants.kMaxSpeedMetersPerSecond,
-                    -m_driverController.getRawAxis(0) * DriveConstants.kMaxSpeedMetersPerSecond,
-                    -m_driverController.getRawAxis(2) * DriveConstants.kMaxChassisAngularSpeedRadiansPerSecond,
-                    false));
+                    m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond,
+                    -m_driverController.getLeftY() * DriveConstants.kMaxSpeedMetersPerSecond,
+                    -m_driverController.getRightX() * DriveConstants.kMaxChassisAngularSpeedRadiansPerSecond,
+                    true));
 
     driveCommand.addRequirements(m_robotDrive);
 

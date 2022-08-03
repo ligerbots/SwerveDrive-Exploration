@@ -98,6 +98,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    m_gyro.reset();
 
     SmartDashboard.putData("Field", m_fieldSim);
   }
@@ -106,25 +107,15 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(
-        new Rotation2d(getHeading()),
+        // new Rotation2d(getHeading()),
+        new Rotation2d(0),
         m_frontLeft.getState(),
         m_frontRight.getState(),
         m_rearLeft.getState(),
         m_rearRight.getState());
 
-    // Update the poses for the swerveModules. Note that the order of rotating the position and then
-    // adding the translation matters
-    for (int i = 0; i < m_swerveModules.length; i++) {
-      var modulePositionFromChassis = kModulePositions[i]
-              .rotateBy(new Rotation2d(getHeading()))
-              .plus(getPose().getTranslation());
-
-      // Module's heading is it's angle relative to the chassis heading
-      m_modulePose[i] = new Pose2d(modulePositionFromChassis, m_swerveModules[i].getState().angle.plus(getPose().getRotation()));
-    }
-
     m_fieldSim.setRobotPose(getPose());
-    m_fieldSim.getObject("Swerve Modules").setPoses(m_modulePose);
+    // m_fieldSim.getObject("Swerve Modules").setPoses(m_modulePose);
   }
 
   /**

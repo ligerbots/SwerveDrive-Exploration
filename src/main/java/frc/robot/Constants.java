@@ -87,7 +87,7 @@ public final class Constants {
     public static final double kvVoltSecondsPerMeter = 2.3;
     public static final double kaVoltSecondsSquaredPerMeter = 0.0917;
 
-    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxSpeedMetersPerSecond = 10;
     public static final double kMaxChassisAngularSpeedRadiansPerSecond = Math.PI / 8.0;
 
     public static final double kvVoltSecondsPerRadian = 3.41;
