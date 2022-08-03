@@ -6,8 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.DriveCommand;
-import frc.robot.commands.TrajSwerve;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -51,11 +49,10 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new TrajSwerve(m_driveTrain).getTrajCommoand();
+    return null;
   }
 
-  public Command getDriveCommand(){
-    // the true or false value for fieldRelative option doesn't seem to make any difference
-    return new DriveCommand(m_driveTrain, m_driveController, true);
+  public Command getDriveCommand() {
+    return null;
   }
 }
