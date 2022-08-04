@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -98,7 +100,18 @@ public class DriveTrain extends SubsystemBase {
     m_yawValue += chassisRotationSpeed * 0.02;
     m_gyroSim.setAngle(-Units.radiansToDegrees(m_yawValue));
 
+    SmartDashboard.putNumber("X-Translation", chassisSpeed.vxMetersPerSecond);
+    SmartDashboard.putNumber("Y-Translation", chassisSpeed.vyMetersPerSecond);
+    SmartDashboard.putNumber("AngularV", chassisSpeed.omegaRadiansPerSecond);
+
     m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
+    Pose2d[] pose = {
+      new Pose2d(new Translation2d(5 + Constants.kModulePositions[0].getX(), 5 + Constants.kModulePositions[0].getY()), m_swerveModuleStates[0].angle),
+      new Pose2d(new Translation2d(5 + Constants.kModulePositions[1].getX(), 5 + Constants.kModulePositions[1].getY()), m_swerveModuleStates[1].angle),
+      new Pose2d(new Translation2d(5 + Constants.kModulePositions[2].getX(), 5 + Constants.kModulePositions[2].getY()), m_swerveModuleStates[2].angle),
+      new Pose2d(new Translation2d(5 + Constants.kModulePositions[3].getX(), 5 + Constants.kModulePositions[3].getY()), m_swerveModuleStates[3].angle),
+    };
+    m_fieldSim.getObject("SwerveModule").setPoses(pose);
   }
 
   public double getHeading() {
