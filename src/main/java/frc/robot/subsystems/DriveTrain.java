@@ -80,13 +80,11 @@ public class DriveTrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // TODO: it worked!! although no idea how these two lines below make any difference
-    m_odometry.update(m_gyro.getRotation2d(), m_swerveModuleStates);
-    // m_odometry.update(new Rotation2d(getHeading()), m_swerveModuleStates);
+    m_odometry.update(getHeading(), m_swerveModuleStates);
   }
   
-  public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
+  public Rotation2d getHeading() {
+    return m_gyro.getRotation2d();
   }
 
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
