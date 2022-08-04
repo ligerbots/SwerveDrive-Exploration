@@ -76,7 +76,8 @@ public final class Constants {
     public static final double kDriveEncoderDistancePerPulse = (kWheelDiameterMeters * Math.PI) / kEncoderCPR;
 
 
-    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxSpeedMetersPerSecond = 8;
 
-    public static final double kMaxChassisAngularSpeedRadiansPerSecond = Math.PI / 8.0;
+    // public static final double kMaxChassisAngularSpeedRadiansPerSecond = Math.PI / 8.0;
+    public static final double kMaxChassisAngularSpeedRadiansPerSecond = 2*Math.PI;
 }

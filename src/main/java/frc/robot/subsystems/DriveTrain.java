@@ -76,20 +76,23 @@ public class DriveTrain extends SubsystemBase {
   /** Creates a new DriveTrain. */
   public DriveTrain() {
     SmartDashboard.putData("Field", m_fieldSim);
-  } 
+  }
 
   @Override
   public void periodic() {
-    m_odometry.update(new Rotation2d(getHeading()), m_swerveModuleStates);
+    // TODO: it worked!! although no idea how these two lines below make any difference
+    m_odometry.update(m_gyro.getRotation2d(), m_swerveModuleStates);
+    // m_odometry.update(new Rotation2d(getHeading()), m_swerveModuleStates);
+  }
+  
+  public double getHeading() {
+    return m_gyro.getRotation2d().getDegrees();
   }
 
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     // Save rotation input for chassis rotation sim
-    m_swerveModuleStates = m_kinematics.toSwerveModuleStates(
-        fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-            : new ChassisSpeeds(xSpeed, ySpeed, rot));
-
+    m_swerveModuleStates = m_kinematics
+        .toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d()));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         m_swerveModuleStates, Constants.kMaxSpeedMetersPerSecond);
   }
@@ -108,15 +111,21 @@ public class DriveTrain extends SubsystemBase {
 
     m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
     Pose2d[] pose = {
-      new Pose2d(new Translation2d(5 + Constants.kModulePositions[0].getX(), 5 + Constants.kModulePositions[0].getY()), m_swerveModuleStates[0].angle),
-      new Pose2d(new Translation2d(5 + Constants.kModulePositions[1].getX(), 5 + Constants.kModulePositions[1].getY()), m_swerveModuleStates[1].angle),
-      new Pose2d(new Translation2d(5 + Constants.kModulePositions[2].getX(), 5 + Constants.kModulePositions[2].getY()), m_swerveModuleStates[2].angle),
-      new Pose2d(new Translation2d(5 + Constants.kModulePositions[3].getX(), 5 + Constants.kModulePositions[3].getY()), m_swerveModuleStates[3].angle),
+        new Pose2d(
+            new Translation2d(5 + Constants.kModulePositions[0].getX(), 5 + Constants.kModulePositions[0].getY()),
+            m_swerveModuleStates[0].angle),
+        new Pose2d(
+            new Translation2d(5 + Constants.kModulePositions[1].getX(), 5 + Constants.kModulePositions[1].getY()),
+            m_swerveModuleStates[1].angle),
+        new Pose2d(
+            new Translation2d(5 + Constants.kModulePositions[2].getX(), 5 + Constants.kModulePositions[2].getY()),
+            m_swerveModuleStates[2].angle),
+        new Pose2d(
+            new Translation2d(5 + Constants.kModulePositions[3].getX(), 5 + Constants.kModulePositions[3].getY()),
+            m_swerveModuleStates[3].angle),
     };
     m_fieldSim.getObject("SwerveModule").setPoses(pose);
   }
 
-  public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
-  }
+
 }
