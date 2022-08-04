@@ -70,6 +70,7 @@ public class DriveTrain extends SubsystemBase {
 
   Field2d m_fieldSim = new Field2d();
   SwerveModuleState[] m_swerveModuleStates = m_kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0));
+
   double m_yawValue = 0;
 
   /** Creates a new DriveTrain. */
@@ -88,6 +89,7 @@ public class DriveTrain extends SubsystemBase {
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
             : new ChassisSpeeds(xSpeed, ySpeed, rot));
+
     SwerveDriveKinematics.desaturateWheelSpeeds(
         m_swerveModuleStates, Constants.kMaxSpeedMetersPerSecond);
   }
