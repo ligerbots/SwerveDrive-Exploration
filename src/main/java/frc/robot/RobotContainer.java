@@ -12,7 +12,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -41,23 +43,28 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    // Configure default commands
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
+        // A split-stick arcade command, with forward/backward controlled by the left
+        // hand, and turning controlled by the right.
+
+    // Note: X, Y, and rot for Throttle/Strafe/Rotation is inverted to match WPILib coordinate system
+    var driveCommand = new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    m_driverController.getLeftY(),
-                    m_driverController.getLeftX(),
-                    m_driverController.getRightX(),
-                    false),
-            m_robotDrive));
+                    m_driverController.getLeftX() * DriveConstants.kMaxSpeedMetersPerSecond,
+                    -m_driverController.getLeftY() * DriveConstants.kMaxSpeedMetersPerSecond,
+                    -m_driverController.getRightX() * DriveConstants.kMaxChassisAngularSpeedRadiansPerSecond,
+                    true));
+
+    driveCommand.addRequirements(m_robotDrive);
+
+    // Configure default commands
+    // Set the default drive command to split-stick arcade drive
+    m_robotDrive.setDefaultCommand(driveCommand);
   }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
@@ -108,6 +115,8 @@ public class RobotContainer {
 
     // Reset odometry to the starting pose of the trajectory.
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+
+    m_robotDrive.showCurrentTrajectory(exampleTrajectory);
 
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
