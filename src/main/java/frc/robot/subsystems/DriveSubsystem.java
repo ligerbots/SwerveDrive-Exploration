@@ -103,19 +103,18 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(
-        new Rotation2d(getHeading()),
-        // new Rotation2d(0),
+        getHeading(),
         m_frontLeft.getState(),
         m_frontRight.getState(),
         m_rearLeft.getState(),
         m_rearRight.getState());
     for (int i = 0; i < m_swerveModules.length; i++) {
       var modulePositionFromChassis = kModulePositions[i]
-          .rotateBy(new Rotation2d(getHeading()));
-          // .plus(getPose().getTranslation());
+          .rotateBy(getHeading())
+          .plus(getPose().getTranslation());
 
       // Module's heading is it's angle relative to the chassis heading
-      m_modulePose[i] = new Pose2d(modulePositionFromChassis.plus(new Translation2d(5, 5)),
+      m_modulePose[i] = new Pose2d(modulePositionFromChassis,
           m_swerveModules[i].getState().angle.plus(getPose().getRotation()));
     }
 
@@ -199,8 +198,8 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
-  public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
+  public Rotation2d getHeading() {
+    return m_gyro.getRotation2d();
   }
 
   /**
@@ -227,10 +226,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    m_frontLeft.simulationPeriodic(0.02);
-    m_frontRight.simulationPeriodic(0.02);
-    m_rearLeft.simulationPeriodic(0.02);
-    m_rearRight.simulationPeriodic(0.02);
+    double dt = 0.02;
+    m_frontLeft.simulationPeriodic(dt);
+    m_frontRight.simulationPeriodic(dt);
+    m_rearLeft.simulationPeriodic(dt);
+    m_rearRight.simulationPeriodic(dt);
 
     SwerveModuleState[] moduleStates = {
         m_frontLeft.getState(),
@@ -242,7 +242,7 @@ public class DriveSubsystem extends SubsystemBase {
     var chassisSpeed = kDriveKinematics.toChassisSpeeds(moduleStates);
     double chassisRotationSpeed = chassisSpeed.omegaRadiansPerSecond;
 
-    m_yawValue += chassisRotationSpeed * 0.02;
+    m_yawValue += chassisRotationSpeed *dt;
     m_gyroSim.setAngle(-Units.radiansToDegrees(m_yawValue));
   }
 }
