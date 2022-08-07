@@ -99,8 +99,8 @@ public final class Constants {
   }
 
   public static final class ModuleConstants {
-    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
-    public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
+    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 4 * Math.PI;
+    public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 4 * Math.PI;
 
     public static final int kEncoderCPR = 2048;
     public static final double kWheelDiameterMeters = 0.15;
@@ -118,9 +118,9 @@ public final class Constants {
         // Assumes the encoders are on a 1:1 reduction with the module shaft.
         (2 * Math.PI) / (double) kEncoderCPR;
 
-    public static final double kPModuleTurningController = 1;
+    public static final double kPModuleTurningController = 1.5;
 
-    public static final double kPModuleDriveController = 1;
+    public static final double kPModuleDriveController = 1.6;
 
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!

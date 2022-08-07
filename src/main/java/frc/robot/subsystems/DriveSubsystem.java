@@ -87,6 +87,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   Field2d m_fieldSim = new Field2d();
 
+  SwerveModuleState[] m_swerveModuleStates = Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0));
   // Simulation variables
   private double m_invertRotationInput = -1;
   private double m_lastRotationSign;
@@ -101,25 +102,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update the odometry in the periodic block
-    m_odometry.update(
-        getHeading(),
-        m_frontLeft.getState(),
-        m_frontRight.getState(),
-        m_rearLeft.getState(),
-        m_rearRight.getState());
-    for (int i = 0; i < m_swerveModules.length; i++) {
-      var modulePositionFromChassis = kModulePositions[i]
-          .rotateBy(getHeading())
-          .plus(getPose().getTranslation());
-
-      // Module's heading is it's angle relative to the chassis heading
-      m_modulePose[i] = new Pose2d(modulePositionFromChassis,
-          m_swerveModules[i].getState().angle.plus(getPose().getRotation()));
-    }
-
-    m_fieldSim.setRobotPose(getPose());
-    m_fieldSim.getObject("Swerve Modules").setPoses(m_modulePose);
+    
   }
 
   /**
@@ -137,7 +120,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+    zeroHeading();
+    m_yawValue = -pose.getRotation().getRadians();
+    m_gyroSim.setAngle(Units.radiansToDegrees(m_yawValue));
+    m_odometry.resetPosition(pose, getHeading());
     resetEncoders();
   }
 
@@ -174,6 +160,9 @@ public class DriveSubsystem extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
+
+    m_swerveModuleStates = desiredStates;
+
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
@@ -191,6 +180,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.reset();
+    m_yawValue = 0;
   }
 
   /**
@@ -244,5 +234,56 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_yawValue += chassisRotationSpeed *dt;
     m_gyroSim.setAngle(-Units.radiansToDegrees(m_yawValue));
+
+    // Update the odometry in the periodic block
+    m_odometry.update(
+        getHeading(),
+        m_frontLeft.getState(),
+        m_frontRight.getState(),
+        m_rearLeft.getState(),
+        m_rearRight.getState());
+    for (int i = 0; i < m_swerveModules.length; i++) {
+      var modulePositionFromChassis = kModulePositions[i]
+          .rotateBy(getHeading())
+          .plus(getPose().getTranslation());
+
+      // Module's heading is it's angle relative to the chassis heading
+      m_modulePose[i] = new Pose2d(modulePositionFromChassis,
+          m_swerveModules[i].getState().angle.plus(getPose().getRotation()));
+    }
+
+    m_fieldSim.setRobotPose(getPose());
+    // m_fieldSim.getObject("Swerve Modules").setPoses(m_modulePose);
+  }
+
+  // No SwerveModule classes taken places
+  // @Override
+  // public void simulationPeriodic() {
+  //   var chassisSpeed = kDriveKinematics.toChassisSpeeds(m_swerveModuleStates);
+  //   double chassisRotationSpeed = chassisSpeed.omegaRadiansPerSecond;
+
+  //   m_yawValue += chassisRotationSpeed * 0.02;
+  //   m_gyroSim.setAngle(-Units.radiansToDegrees(m_yawValue));
+
+  //   // Update the odometry in the periodic block
+  //   m_odometry.update(
+  //       getHeading(),
+  //       m_swerveModuleStates);
+  //   // for (int i = 0; i < m_swerveModules.length; i++) {
+  //   //   var modulePositionFromChassis = kModulePositions[i]
+  //   //       .rotateBy(getHeading())
+  //   //       .plus(getPose().getTranslation());
+
+  //   //   // Module's heading is it's angle relative to the chassis heading
+  //   //   m_modulePose[i] = new Pose2d(modulePositionFromChassis,
+  //   //       m_swerveModules[i].getState().angle.plus(getPose().getRotation()));
+  //   // }
+
+  //   m_fieldSim.setRobotPose(getPose());
+  //   // m_fieldSim.getObject("Swerve Modules").setPoses(m_modulePose);
+  // }
+
+  public void stop(){
+    setModuleStates(Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0)));
   }
 }
